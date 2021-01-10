@@ -1,7 +1,10 @@
 data class Message (
-    val id: Long,
+    val id: Long = 0L,
+    val chatId: Long,
     val ownerId: Long,
     val recipientId: Long,
-    val text: String,
-    val read: Boolean
-)
+    val text: String
+) {
+    var read: Boolean = false
+    var deleted: Boolean = false
+}
