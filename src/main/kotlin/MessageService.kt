@@ -20,7 +20,14 @@ object MessageService: CrudService<Message> {
     }
 
     override fun delete(id: Long) {
-        messages.filter { id == id }[0].deleted = true
+        val message = messages.filter { id == id }[0]
+        message.deleted = true
+
+        when {
+            ChatService.readMessages(message.chatId, 0L, 0).isEmpty() -> {
+                ChatService.delete(message.chatId)
+            }
+        }
     }
 
     override fun restore(id: Long) {
