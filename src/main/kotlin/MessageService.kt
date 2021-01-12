@@ -9,19 +9,22 @@ object MessageService: CrudService<Message> {
     }
 
     override fun read(): List<Message> {
-        TODO("Not yet implemented")
+        return messages.filter { !it.deleted }
     }
 
     override fun update(entity: Message) {
-        TODO("Not yet implemented")
+        val message = entity.copy(text = entity.text)
+
+        messages.remove(entity)
+        messages.add(message)
     }
 
     override fun delete(id: Long) {
-        TODO("Not yet implemented")
+        messages.filter { id == id }[0].deleted = true
     }
 
     override fun restore(id: Long) {
-        TODO("Not yet implemented")
+        messages.filter { id == id }[0].deleted = false
     }
 
     override fun markRead(id: Long) {
