@@ -44,15 +44,26 @@ object MessageService: CrudService<Message> {
     }
 
     fun read(chatId: Long, messageId: Long, offset: Int): List<Message> {
-        // TODO: если offset = 0, возвращать все сообщения
-        return messages
-            .filter { it.chatId == chatId && it.id >= messageId }
-            .take(offset)
+        return when(offset) {
+            0 -> messages
+                .filter { it.chatId == chatId && it.id >= messageId }
+            else -> messages
+                .filter { it.chatId == chatId && it.id >= messageId }
+                .take(offset)
+        }
     }
 
     fun markRead(chatId: Long, messageId: Long, offset: Int) {
         for(message in read(chatId = chatId, messageId = messageId, offset = offset)) {
                 markRead(message.id)
         }
+    }
+
+    fun deleteAll(chatId: Long) {
+       for(message in messages) {
+           if(message.chatId == chatId) {
+               message.deleted = true
+           }
+       }
     }
 }

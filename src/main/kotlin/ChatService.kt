@@ -19,6 +19,8 @@ object ChatService: CrudService<Chat> {
         for(chat in chats.filter { it.id == id }) {
             chat.deleted = true
         }
+
+        chats.filter { it.id == id }[0].deleted = true
     }
 
     override fun restore(id: Long) {
@@ -42,14 +44,14 @@ object ChatService: CrudService<Chat> {
     }
 
     fun getUnreadChatsCount(): Int {
-        var result = 0
+        return chats.count { chat -> MessageService.read(chat.id, 0L, 0).any { !it.deleted && !it.read}}
+    }
 
+    fun deleteAll() {
         for(chat in chats) {
-            if (chat.messages.any { !it.read }) {
-                result++
-            }
-        }
+            chat.deleted = true
 
-        return result
+            MessageService.deleteAll(chat.id)
+        }
     }
 }
