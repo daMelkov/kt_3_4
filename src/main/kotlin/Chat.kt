@@ -1,6 +1,6 @@
 data class Chat (
     val id: Long,
-    val messages: List<Message>? = null
+    val messages: List<Message>
 ) {
     var deleted: Boolean = false
 }
