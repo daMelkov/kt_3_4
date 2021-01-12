@@ -3,8 +3,13 @@ object MessageService: CrudService<Message> {
 
     override fun create(entity: Message): Long {
         val id = (messages.size + 1).toLong()
-        messages.add(entity.copy(id = id))
+        var chatId = entity.chatId
 
+        if(chatId == 0L) {
+            chatId = ChatService.create(Chat(id = 0L))
+        }
+
+        messages.add(entity.copy(id = id, chatId = chatId))
         return id
     }
 

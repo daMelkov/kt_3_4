@@ -52,5 +52,4 @@ object ChatService: CrudService<Chat> {
 
         return result
     }
-
 }
