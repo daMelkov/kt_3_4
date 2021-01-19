@@ -45,25 +45,28 @@ object MessageService: CrudService<Message> {
 
     fun read(chatId: Long, messageId: Long, offset: Int): List<Message> {
         return when(offset) {
-            0 -> messages
-                .filter { it.chatId == chatId && it.id >= messageId }
-            else -> messages
-                .filter { it.chatId == chatId && it.id >= messageId }
+            0 -> messages.asSequence()
+                .filter { it.chatId == chatId }
+                .filter { it.id >= messageId }
+                .toList()
+            else -> messages.asSequence()
+                .filter { it.chatId == chatId }
+                .filter { it.id >= messageId }
                 .take(offset)
+                .toList()
         }
     }
 
     fun markRead(chatId: Long, messageId: Long, offset: Int) {
-        for(message in read(chatId = chatId, messageId = messageId, offset = offset)) {
-                markRead(message.id)
-        }
+        read(chatId = chatId, messageId = messageId, offset = offset).asSequence()
+            .map { m -> m.apply { markRead(m.id) } }
+            .toList()
     }
 
     fun deleteAll(chatId: Long) {
-       for(message in messages) {
-           if(message.chatId == chatId) {
-               message.deleted = true
-           }
-       }
+        messages.asSequence()
+            .filter { c -> c.chatId == chatId }
+            .map { c -> c.apply { deleted = true }}
+            .toList()
     }
 }
