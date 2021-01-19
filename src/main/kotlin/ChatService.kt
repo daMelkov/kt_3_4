@@ -16,17 +16,17 @@ object ChatService: CrudService<Chat> {
     }
 
     override fun delete(id: Long) {
-        for(chat in chats.filter { it.id == id }) {
-            chat.deleted = true
-        }
-
-        chats.filter { it.id == id }[0].deleted = true
+        chats.asSequence()
+            .filter { it.id == id }
+            .map { c -> c.apply { c.deleted = true }}
+            .toList()
     }
 
     override fun restore(id: Long) {
-        for(chat in chats.filter { it.id == id }) {
-            chat.deleted = false
-        }
+        chats.asSequence()
+            .filter { it.id == id }
+            .map { c -> c.apply { c.deleted = false } }
+            .toList()
     }
 
     override fun markRead(id: Long) {
@@ -44,14 +44,16 @@ object ChatService: CrudService<Chat> {
     }
 
     fun getUnreadChatsCount(): Int {
-        return chats.count { chat -> MessageService.read(chat.id, 0L, 0).any { !it.deleted && !it.read}}
+        return chats
+            .count { chat -> MessageService.read(chat.id, 0L, 0)
+            .any { !it.deleted && !it.read}}
     }
 
     fun deleteAll() {
-        for(chat in chats) {
-            chat.deleted = true
-
-            MessageService.deleteAll(chat.id)
-        }
+        chats.asSequence()
+            .map { c ->
+                c.apply { c.deleted = true };
+                c.apply { MessageService.deleteAll(c.id) }}
+            .toList()
     }
 }
